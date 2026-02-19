@@ -1,0 +1,306 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model categorias {
+  id          String      @id @db.Char(36)
+  negocio_id  String      @db.Char(36)
+  nombre      String      @db.VarChar(50)
+  descripcion String?     @db.VarChar(255)
+  negocios    negocios    @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "categorias_ibfk_1")
+  productos   productos[]
+
+  @@index([negocio_id], map: "negocio_id")
+}
+
+model clientes {
+  id                String    @id @db.Char(36)
+  negocio_id        String    @db.Char(36)
+  nombre            String?   @db.VarChar(100)
+  telefono          String    @db.VarChar(20)
+  email             String?   @db.VarChar(100)
+  direccion_entrega String?   @db.Text
+  fecha_registro    DateTime? @default(now()) @db.Timestamp(0)
+  negocios          negocios  @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "clientes_ibfk_1")
+  ventas            ventas[]
+
+  @@unique([negocio_id, telefono], map: "negocio_id")
+}
+
+model codigos_verificacion {
+  id         Int      @id @default(autoincrement())
+  usuario_id String   @db.Char(36)
+  codigo     String   @db.VarChar(6)
+  expiracion DateTime @db.DateTime(0)
+  usado      Boolean? @default(false)
+  usuarios   usuarios @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "codigos_verificacion_ibfk_1")
+
+  @@index([usuario_id], map: "usuario_id")
+}
+
+model compras {
+  id              String            @id @db.Char(36)
+  negocio_id      String            @db.Char(36)
+  sucursal_id     String            @db.Char(36)
+  proveedor_id    String?           @db.Char(36)
+  total           Decimal           @db.Decimal(12, 2)
+  fecha           DateTime?         @default(now()) @db.Timestamp(0)
+  negocios        negocios          @relation(fields: [negocio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "compras_ibfk_1")
+  sucursales      sucursales        @relation(fields: [sucursal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "compras_ibfk_2")
+  proveedores     proveedores?      @relation(fields: [proveedor_id], references: [id], onUpdate: NoAction, map: "compras_ibfk_3")
+  detalle_compras detalle_compras[]
+
+  @@index([negocio_id], map: "negocio_id")
+  @@index([proveedor_id], map: "proveedor_id")
+  @@index([sucursal_id], map: "sucursal_id")
+}
+
+model detalle_compras {
+  id             String  @id @db.Char(36)
+  compra_id      String  @db.Char(36)
+  sku_id         String  @db.Char(36)
+  cantidad       Int
+  costo_unitario Decimal @db.Decimal(12, 2)
+  compras        compras @relation(fields: [compra_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "detalle_compras_ibfk_1")
+  skus           skus    @relation(fields: [sku_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "detalle_compras_ibfk_2")
+
+  @@index([compra_id], map: "compra_id")
+  @@index([sku_id], map: "sku_id")
+}
+
+model detalle_ventas {
+  id                  String   @id @db.Char(36)
+  venta_id            String   @db.Char(36)
+  sku_id              String   @db.Char(36)
+  cantidad            Int
+  precio_aplicado     Decimal  @db.Decimal(12, 2)
+  descuento_aplicado  Decimal? @default(0.00) @db.Decimal(12, 2)
+  costo_momento_venta Decimal  @db.Decimal(12, 2)
+  ventas              ventas   @relation(fields: [venta_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "detalle_ventas_ibfk_1")
+  skus                skus     @relation(fields: [sku_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "detalle_ventas_ibfk_2")
+
+  @@index([sku_id], map: "sku_id")
+  @@index([venta_id], map: "venta_id")
+}
+
+model gastos {
+  id              String                  @id @db.Char(36)
+  negocio_id      String                  @db.Char(36)
+  sucursal_id     String                  @db.Char(36)
+  monto           Decimal                 @db.Decimal(12, 2)
+  descripcion     String?                 @db.VarChar(255)
+  categoria_gasto gastos_categoria_gasto?
+  fecha           DateTime                @db.Date
+  negocios        negocios                @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "gastos_ibfk_1")
+  sucursales      sucursales              @relation(fields: [sucursal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "gastos_ibfk_2")
+
+  @@index([negocio_id], map: "negocio_id")
+  @@index([sucursal_id], map: "sucursal_id")
+}
+
+model inventario_stock {
+  id                  String     @id @db.Char(36)
+  sku_id              String     @db.Char(36)
+  sucursal_id         String     @db.Char(36)
+  cantidad_disponible Int?       @default(0)
+  cantidad_reservada  Int?       @default(0)
+  skus                skus       @relation(fields: [sku_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "inventario_stock_ibfk_1")
+  sucursales          sucursales @relation(fields: [sucursal_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "inventario_stock_ibfk_2")
+
+  @@index([sku_id, sucursal_id], map: "sku_id")
+  @@index([sucursal_id], map: "sucursal_id")
+}
+
+model negocios {
+  id                     String        @id @db.Char(36)
+  nombre_comercial       String        @db.VarChar(100)
+  wa_id                  String        @unique(map: "wa_id") @db.VarChar(20)
+  nit_rut                String?       @db.VarChar(20)
+  logo_url               String?       @db.Text
+  slogan                 String?       @db.VarChar(255)
+  datos_facturacion_json Json?
+  fecha_registro         DateTime?     @default(now()) @db.Timestamp(0)
+  categorias             categorias[]
+  clientes               clientes[]
+  compras                compras[]
+  gastos                 gastos[]
+  productos              productos[]
+  promociones            promociones[]
+  proveedores            proveedores[]
+  sucursales             sucursales[]
+  usuarios               usuarios[]
+  ventas                 ventas[]
+}
+
+model producto_imagenes {
+  id           String    @id @db.Char(36)
+  producto_id  String    @db.Char(36)
+  sku_id       String?   @db.Char(36)
+  url_imagen   String    @db.Text
+  es_principal Boolean?  @default(false)
+  productos    productos @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "producto_imagenes_ibfk_1")
+  skus         skus?     @relation(fields: [sku_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "producto_imagenes_ibfk_2")
+
+  @@index([producto_id], map: "producto_id")
+  @@index([sku_id], map: "sku_id")
+}
+
+model productos {
+  id                String              @id @db.Char(36)
+  negocio_id        String              @db.Char(36)
+  categoria_id      String?             @db.Char(36)
+  nombre            String              @db.VarChar(150)
+  descripcion       String?             @db.Text
+  producto_imagenes producto_imagenes[]
+  negocios          negocios            @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "productos_ibfk_1")
+  categorias        categorias?         @relation(fields: [categoria_id], references: [id], onUpdate: NoAction, map: "productos_ibfk_2")
+  skus              skus[]
+
+  @@index([categoria_id], map: "categoria_id")
+  @@index([negocio_id], map: "negocio_id")
+}
+
+model promocion_skus {
+  promocion_id String      @db.Char(36)
+  sku_id       String      @db.Char(36)
+  promociones  promociones @relation(fields: [promocion_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "promocion_skus_ibfk_1")
+  skus         skus        @relation(fields: [sku_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "promocion_skus_ibfk_2")
+
+  @@id([promocion_id, sku_id])
+  @@index([sku_id], map: "sku_id")
+}
+
+model promociones {
+  id             String           @id @db.Char(36)
+  negocio_id     String           @db.Char(36)
+  nombre         String?          @db.VarChar(100)
+  tipo           promociones_tipo
+  valor          Decimal          @db.Decimal(12, 2)
+  fecha_inicio   DateTime         @db.DateTime(0)
+  fecha_fin      DateTime         @db.DateTime(0)
+  activa         Boolean?         @default(true)
+  promocion_skus promocion_skus[]
+  negocios       negocios         @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "promociones_ibfk_1")
+
+  @@index([negocio_id], map: "negocio_id")
+}
+
+model proveedores {
+  id         String    @id @db.Char(36)
+  negocio_id String    @db.Char(36)
+  nombre     String    @db.VarChar(100)
+  telefono   String?   @db.VarChar(20)
+  compras    compras[]
+  negocios   negocios  @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "proveedores_ibfk_1")
+
+  @@index([negocio_id], map: "negocio_id")
+}
+
+model sku_variantes {
+  id              String @id @db.Char(36)
+  sku_id          String @db.Char(36)
+  nombre_atributo String @db.VarChar(50)
+  valor_atributo  String @db.VarChar(50)
+  skus            skus   @relation(fields: [sku_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sku_variantes_ibfk_1")
+
+  @@index([sku_id], map: "sku_id")
+}
+
+model skus {
+  id                    String              @id @db.Char(36)
+  producto_id           String              @db.Char(36)
+  codigo_barras         String?             @db.VarChar(50)
+  precio_venta          Decimal?            @default(0.00) @db.Decimal(12, 2)
+  precio_costo_promedio Decimal?            @default(0.00) @db.Decimal(12, 2)
+  detalle_compras       detalle_compras[]
+  detalle_ventas        detalle_ventas[]
+  inventario_stock      inventario_stock[]
+  producto_imagenes     producto_imagenes[]
+  promocion_skus        promocion_skus[]
+  sku_variantes         sku_variantes[]
+  productos             productos           @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "skus_ibfk_1")
+
+  @@index([producto_id], map: "producto_id")
+}
+
+model sucursales {
+  id               String             @id @db.Char(36)
+  negocio_id       String             @db.Char(36)
+  nombre           String             @db.VarChar(100)
+  es_principal     Boolean?           @default(true)
+  direccion        String?            @db.Text
+  compras          compras[]
+  gastos           gastos[]
+  inventario_stock inventario_stock[]
+  negocios         negocios           @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sucursales_ibfk_1")
+  ventas           ventas[]
+
+  @@index([negocio_id], map: "negocio_id")
+}
+
+model usuarios {
+  id                   String                 @id @db.Char(36)
+  negocio_id           String                 @db.Char(36)
+  nombre               String                 @db.VarChar(100)
+  telefono             String                 @unique(map: "telefono") @db.VarChar(20)
+  password_hash        String?                @db.Text
+  rol                  usuarios_rol
+  verificado           Boolean?               @default(false)
+  activo               Boolean?               @default(true)
+  codigos_verificacion codigos_verificacion[]
+  negocios             negocios               @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "usuarios_ibfk_1")
+  ventas               ventas[]
+
+  @@index([negocio_id], map: "negocio_id")
+}
+
+model ventas {
+  id              String           @id @db.Char(36)
+  negocio_id      String           @db.Char(36)
+  sucursal_id     String           @db.Char(36)
+  usuario_id      String?          @db.Char(36)
+  canal           ventas_canal
+  total           Decimal          @db.Decimal(12, 2)
+  descuento_total Decimal?         @default(0.00) @db.Decimal(12, 2)
+  fecha           DateTime?        @default(now()) @db.Timestamp(0)
+  cliente_id      String?          @db.Char(36)
+  detalle_ventas  detalle_ventas[]
+  clientes        clientes?        @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ventas_cliente")
+  negocios        negocios         @relation(fields: [negocio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ventas_ibfk_1")
+  sucursales      sucursales       @relation(fields: [sucursal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ventas_ibfk_2")
+  usuarios        usuarios?        @relation(fields: [usuario_id], references: [id], onUpdate: NoAction, map: "ventas_ibfk_3")
+
+  @@index([cliente_id], map: "fk_ventas_cliente")
+  @@index([negocio_id], map: "negocio_id")
+  @@index([sucursal_id], map: "sucursal_id")
+  @@index([usuario_id], map: "usuario_id")
+}
+
+enum promociones_tipo {
+  PORCENTAJE
+  MONTO_FIJO
+}
+
+enum ventas_canal {
+  WHATSAPP
+  LOCAL
+  ECOMMERCE
+}
+
+enum gastos_categoria_gasto {
+  ALQUILER
+  SERVICIOS
+  NOMINA
+  MARKETING
+  OTROS
+}
+
+enum usuarios_rol {
+  ADMIN
+  VENDEDOR
+}
