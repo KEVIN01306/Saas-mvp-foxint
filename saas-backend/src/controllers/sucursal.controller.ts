@@ -1,17 +1,20 @@
 import type { NextFunction, Request, Response } from "express";
 import SucursalService from "../services/sucursal.service.js";
 import Respuesta from "../helpers/Respuesta.js";
+import prisma from "../configs/db.config.js";
+import BaseController from "./base.controller.js";
 
-class SucursalController {
-    private readonly sucursalService: SucursalService;
-    constructor(sucursalService: SucursalService) {
-        this.sucursalService = sucursalService;
+class SucursalController extends BaseController {
+    constructor(private readonly sucursalService: SucursalService) {
+        super()
     }
 
     public obtenerSucursales = async (_req: Request, res: Response, next: NextFunction) => {
         try {
-            const sucursales = await this.sucursalService.obtenerSucursales()
-            res.status(200).json(Respuesta.exito("Sucursales obtenidas con exito", sucursales))
+            const { limit, offset } = res.locals.query
+            const { negocio_id } = this.obtenerEntorno(res)
+            const sucursales = await this.sucursalService.obtenerSucursales(limit, offset, negocio_id)
+            res.status(200).json(Respuesta.paginacion("Sucursales obtenidas con exito", sucursales.data, sucursales.total, sucursales.limit, sucursales.offset))
         } catch (error) {
             next(error)
         }
@@ -20,7 +23,8 @@ class SucursalController {
     public obtenerSucursal = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params
-            const sucursal = await this.sucursalService.obtenerSucursalPorId(String(id))
+            const { negocio_id } = this.obtenerEntorno(res)
+            const sucursal = await this.sucursalService.obtenerSucursal(String(id), negocio_id)
             res.status(200).json(Respuesta.exito("Sucursal obtenida con exito", sucursal))
         } catch (error) {
             next(error)
@@ -30,7 +34,8 @@ class SucursalController {
     public crearSucursal = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const data = req.body
-            const sucursalCreada = await this.sucursalService.crearSucursal(data)
+            const { negocio_id } = this.obtenerEntorno(res)
+            const sucursalCreada = await this.sucursalService.crearSucursal(data, negocio_id)
             res.status(201).json(Respuesta.exito("Sucursal creada con exito", sucursalCreada))
         } catch (error) {
             next(error)
@@ -41,7 +46,8 @@ class SucursalController {
         try {
             const { id } = req.params
             const data = req.body
-            const sucursalActualizada = await this.sucursalService.actualizarSucursal(String(id), data)
+            const { negocio_id } = this.obtenerEntorno(res)
+            const sucursalActualizada = await this.sucursalService.actualizarSucursal(String(id), data, negocio_id)
             res.status(200).json(Respuesta.exito("Sucursal actualizada con exito", sucursalActualizada))
         } catch (error) {
             next(error)
@@ -49,5 +55,5 @@ class SucursalController {
     }
 }
 
-const sucursalService = new SucursalService()
+const sucursalService = new SucursalService(prisma)
 export default new SucursalController(sucursalService);

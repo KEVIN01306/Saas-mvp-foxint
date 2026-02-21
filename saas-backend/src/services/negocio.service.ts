@@ -1,27 +1,23 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import prisma from "../configs/db.config.js";
 import AppError from "../errors/AppError.js";
 import { negocioDetalleSelector, negocioListaSelector } from "../selectors/negocio.selector.js";
 import type { NegocioActualizarType, NegocioCrearType, NegocioType } from "../types/negocio.type.js";
 import ManejadorArchivosUtils from "../utils/manejadorArchivos.utils.js";
+import { BaseService } from "./base.service.js";
 
 
-class NegocioService {
-    constructor() { }
-    public async obtenerNegocios() {
-        const negocios = await prisma.negocios.findMany({
-            select: negocioListaSelector
-        })
+class NegocioService extends BaseService {
 
-        if (!negocios || negocios.length === 0) {
-            throw new AppError('No se encontraron negocios', 'DATA_NOT_FOUND', 404)
-        }
-
-        return negocios
+    constructor(db: any) {
+        super(db)
     }
 
-    public async obtenerNegocio(id: NegocioType['id']) {
-        const negocio = await prisma.negocios.findUnique({
+    public async obtenerNegocio(id: NegocioType['id'], negocio_id: NegocioType['id']) {
+        if (!(negocio_id === id)) {
+            throw new AppError('No tienes permiso para acceder a este negocio', 'DATA_NOT_FOUND', 404)
+        }
+
+        const negocio = await this.db.negocios.findUnique({
             where: { id },
             select: negocioDetalleSelector
         })
@@ -34,7 +30,7 @@ class NegocioService {
     }
 
     public async crearNegocio(data: NegocioCrearType, logo: NegocioType['logo_url']) {
-        const negocioExistente = await prisma.negocios.findUnique({
+        const negocioExistente = await this.db.negocios.findUnique({
             where: { wa_id: data.wa_id }
         })
 
@@ -49,7 +45,7 @@ class NegocioService {
             logo_url: logo
         }
 
-        const negocio = await prisma.negocios.create({
+        const negocio = await this.db.negocios.create({
             data: nuevoNegocio,
             select: negocioDetalleSelector
         })
@@ -57,11 +53,14 @@ class NegocioService {
         return negocio
     }
 
-    public async actualizarNegocio(id: NegocioType['id'], data: Partial<NegocioActualizarType>, logo: NegocioType['logo_url']) {
+    public async actualizarNegocio(id: NegocioType['id'], data: Partial<NegocioActualizarType>, logo: NegocioType['logo_url'], negocio_id: NegocioType['id']) {
+        if (!(negocio_id === id)) {
+            throw new AppError('No tienes permiso para acceder a este negocio', 'DATA_NOT_FOUND', 404)
+        }
         try {
 
             if (logo) {
-                const negocioActual = await prisma.negocios.findUnique({
+                const negocioActual = await this.db.negocios.findUnique({
                     where: { id },
                     select: { logo_url: true }
                 })
@@ -73,7 +72,7 @@ class NegocioService {
                 data.logo_url = logo
             }
 
-            const negocio = await prisma.negocios.update({
+            const negocio = await this.db.negocios.update({
                 where: { id },
                 data,
                 select: negocioDetalleSelector

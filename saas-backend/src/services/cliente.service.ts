@@ -1,29 +1,28 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import prisma from "../configs/db.config.js"
 import AppError from "../errors/AppError.js"
 import type { ClienteActualizarType, ClienteCrearType, ClienteType } from "../types/cliente.type.js"
 import { clienteDetalleSelector, clienteListaSelector } from "../selectors/cliente.selector.js"
+import { BaseService } from "./base.service.js"
 
+class ClienteService extends BaseService {
 
-class ClienteService {
-
-    constructor() { }
-
-    public async obtenerClientes() {
-        const clientes = await prisma.clientes.findMany({
-            select: clienteListaSelector
-        })
-
-        if (!clientes || clientes.length === 0) {
-            throw new AppError('No se encontraron clientes', 'DATA_NOT_FOUND', 404)
-        }
-
-        return clientes
+    constructor(db: any) {
+        super(db)
     }
 
-    public async obtenerCliente(id: ClienteType['id']) {
-        const cliente = await prisma.clientes.findUnique({
-            where: { id },
+    public async obtenerClientes(limit = 10, offset = 0, negocio_id: ClienteType['negocio_id']) {
+        return await this.paginacion<ClienteType>(this.db.clientes, {
+            limit,
+            offset,
+            negocio_id,
+            select: clienteListaSelector,
+            orderBy: { fecha_registro: 'desc' }
+        })
+    }
+
+    public async obtenerCliente(id: ClienteType['id'], negocio_id: ClienteType['negocio_id']) {
+        const cliente = await this.db.clientes.findUnique({
+            where: { id, negocio_id },
             select: clienteDetalleSelector
         })
 
@@ -34,9 +33,9 @@ class ClienteService {
         return cliente
     }
 
-    public async crearCliente(data: ClienteCrearType) {
-        const clienteExistente = await prisma.clientes.findFirst({
-            where: { telefono: data.telefono, negocio_id: data.negocio_id }
+    public async crearCliente(data: ClienteCrearType, negocio_id: ClienteType['negocio_id']) {
+        const clienteExistente = await this.db.clientes.findFirst({
+            where: { telefono: data.telefono, negocio_id }
         })
 
         if (clienteExistente) {
@@ -46,10 +45,11 @@ class ClienteService {
         const nuevoCliente = {
             ...data,
             id: crypto.randomUUID(),
+            negocio_id,
             fecha_registro: new Date()
         }
 
-        const cliente = await prisma.clientes.create({
+        const cliente = await this.db.clientes.create({
             data: nuevoCliente,
             select: clienteDetalleSelector
         })
@@ -57,11 +57,11 @@ class ClienteService {
         return cliente
     }
 
-    public async actualizarCliente(id: ClienteType['id'], data: Partial<ClienteActualizarType>) {
+    public async actualizarCliente(id: ClienteType['id'], data: Partial<ClienteActualizarType>, negocio_id: ClienteType['negocio_id']) {
         try {
-            const cliente = await prisma.clientes.update({
+            const cliente = await this.db.clientes.update({
                 where: { id },
-                data,
+                data: { ...data, negocio_id },
                 select: clienteDetalleSelector
             })
 

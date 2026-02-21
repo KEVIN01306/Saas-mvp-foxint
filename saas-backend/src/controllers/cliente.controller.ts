@@ -1,50 +1,56 @@
 import type { NextFunction, Request, Response } from "express"
 import ClienteService from "../services/cliente.service.js"
 import Respuesta from "../helpers/Respuesta.js"
+import prisma from "../configs/db.config.js";
+import BaseController from "./base.controller.js";
 
 
-class ClienteController {
+class ClienteController extends BaseController {
 
-    private readonly clienteService: ClienteService
 
-    constructor(clienteService: ClienteService) {
-        this.clienteService = clienteService
+    constructor(private readonly clienteService: ClienteService) {
+        super()
     }
 
-    public async obtenerClientes(_req: Request, res: Response, next: NextFunction) {
+    public obtenerClientes = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const clientes = await this.clienteService.obtenerClientes()
-            res.status(200).json(Respuesta.exito('Clientes obtenidos con exito', clientes))
+            const { limit, offset } = res.locals.query
+            const { negocio_id } = this.obtenerEntorno(res)
+            const clientes = await this.clienteService.obtenerClientes(limit, offset, negocio_id)
+            res.status(200).json(Respuesta.paginacion('Clientes obtenidos con exito', clientes.data, clientes.total, clientes.limit, clientes.offset))
         } catch (error) {
             next(error)
         }
     };
 
-    public async obtenerCliente(req: Request, res: Response, next: NextFunction) {
+    public obtenerCliente = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id } = req.params
-            const cliente = await this.clienteService.obtenerCliente(String(id))
+            const { negocio_id } = this.obtenerEntorno(res)
+            const cliente = await this.clienteService.obtenerCliente(String(id), negocio_id)
             res.status(200).json(Respuesta.exito('Cliente obtenido con exito', cliente))
         } catch (error) {
             next(error)
         }
     }
 
-    public async crearCliente(req: Request, res: Response, next: NextFunction) {
+    public crearCliente = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const data = req.body
-            const cliente = await this.clienteService.crearCliente(data)
+            const { negocio_id } = this.obtenerEntorno(res)
+            const cliente = await this.clienteService.crearCliente(data, negocio_id)
             res.status(200).json(Respuesta.exito('Cliente creado con exito', cliente))
         } catch (error) {
             next(error)
         }
     }
 
-    public async actualizarCliente(req: Request, res: Response, next: NextFunction) {
+    public actualizarCliente = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id } = req.params
             const data = req.body
-            const cliente = await this.clienteService.actualizarCliente(String(id), data)
+            const { negocio_id } = this.obtenerEntorno(res)
+            const cliente = await this.clienteService.actualizarCliente(String(id), data, negocio_id)
             res.status(200).json(Respuesta.exito('Cliente actualizado con exito', cliente))
         } catch (error) {
             next(error)
@@ -53,5 +59,5 @@ class ClienteController {
     }
 }
 
-const clienteService = new ClienteService()
+const clienteService = new ClienteService(prisma)
 export default new ClienteController(clienteService);

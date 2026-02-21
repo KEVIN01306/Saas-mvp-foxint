@@ -1,18 +1,19 @@
-import prisma from "../configs/db.config.js";
 import AppError from "../errors/AppError.js";
 import argon2 from 'argon2';
 import JwtProvider from "../helpers/jwt.helper.js";
 import { usuarioDetalleSelector } from "../selectors/usuario.selector.js";
+import type { PrismaClient } from "@prisma/client/extension";
 
 class AuthService {
     private readonly jwtProvider: JwtProvider;
-
-    constructor() {
+    private readonly db: PrismaClient;
+    constructor(db: PrismaClient) {
         this.jwtProvider = new JwtProvider();
+        this.db = db;
     }
 
     public async login(telefono: string, password_plano: string) {
-        const usuario = await prisma.usuarios.findUnique({
+        const usuario = await this.db.usuarios.findUnique({
             where: { telefono },
         });
 
@@ -24,8 +25,8 @@ class AuthService {
             throw new AppError('Credenciales inválidas', 'AUTH_FAILED', 401);
         }
 
-        const tokens = await this.jwtProvider.generateTokens(usuario.id, usuario.rol);
-        const usuarioData = await prisma.usuarios.findUnique({
+        const tokens = await this.jwtProvider.generateTokens(usuario.id, usuario.rol, usuario.negocio_id);
+        const usuarioData = await this.db.usuarios.findUnique({
             where: { id: usuario.id },
             select: usuarioDetalleSelector
         });
@@ -38,7 +39,7 @@ class AuthService {
 
             if (!payload.sub) throw new Error();
 
-            const usuario = await prisma.usuarios.findUnique({
+            const usuario = await this.db.usuarios.findUnique({
                 where: { id: payload.sub, activo: true },
                 select: usuarioDetalleSelector
             });
@@ -46,8 +47,7 @@ class AuthService {
             if (!usuario) {
                 throw new AppError('Usuario no encontrado o inactivo', 'USER_NOT_FOUND', 404);
             }
-
-            return await this.jwtProvider.generateTokens(usuario.id, usuario.rol);
+            return await this.jwtProvider.generateTokens(usuario.id, usuario.rol, usuario.negocios.id);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError('Token de refresco inválido o expirado', 'INVALID_REFRESH_TOKEN', 403);
@@ -56,7 +56,7 @@ class AuthService {
 
 
     public async obtenerPerfilActual(id: string) {
-        const usuario = await prisma.usuarios.findUnique({
+        const usuario = await this.db.usuarios.findUnique({
             where: { id },
             select: usuarioDetalleSelector
         });

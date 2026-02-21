@@ -15,6 +15,20 @@ class ValidarMiddleware {
                 next(error);
             }
         };
+
+    public ValidarQuery = (schema: z.ZodTypeAny) =>
+        async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                const queryValidada = await schema.parseAsync(req.query);
+                res.locals.query = queryValidada;
+                next();
+            } catch (error) {
+                if (error instanceof ZodError) {
+                    return res.status(400).json(Respuesta.validacion(error));
+                }
+                next(error);
+            }
+        };
 }
 
 export default new ValidarMiddleware();

@@ -12,6 +12,6 @@ export const usuariosSchema = z.object({
     activo: z.boolean()
 })
 
-export const usuariosCrearSchema = usuariosSchema.omit({ id: true, verificado: true, activo: true })
+export const usuariosCrearSchema = usuariosSchema.omit({ id: true, negocio_id: true, verificado: true, activo: true })
 
-export const usuarioActualizarSchema = usuariosSchema.pick({ nombre: true, telefono: true })
+export const usuarioActualizarSchema = usuariosSchema.omit({ id: true, negocio_id: true, password_hash: true, verificado: true, activo: true })

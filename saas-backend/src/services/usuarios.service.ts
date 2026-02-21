@@ -1,31 +1,34 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import prisma from "../configs/db.config.js";
 import AppError from "../errors/AppError.js";
 import { usuarioDetalleSelector, usuarioListaSelector } from "../selectors/usuario.selector.js";
 import type { UsuarioActualizarType, UsuarioCrearType, UsuarioType } from "../types/usuario.type.js";
 import argon2 from 'argon2'
+import { BaseService } from "./base.service.js";
 
-class UsuarioServices {
+class UsuarioServices extends BaseService {
 
-    public async obtenerUsuarios() {
-        const usuarios = await prisma.usuarios.findMany({
+    constructor(db: any) {
+        super(db)
+    }
+
+    public async obtenerUsuarios(limit = 10, offset = 0, negocio_id: UsuarioType['negocio_id']) {
+        return this.paginacion<UsuarioType>(this.db.usuarios, {
             where: {
                 activo: true
             },
-            select: usuarioListaSelector
+            limit,
+            offset,
+            negocio_id,
+            select: usuarioListaSelector,
+            orderBy: { nombre: 'asc' }
         })
-
-        if (!usuarios || usuarios.length === 0) {
-            throw new AppError('No se encontraron usuarios', 'DATA_NOT_FOUND', 404);
-        }
-
-        return usuarios
     }
 
-    public async obtenerUsuario(id: UsuarioType['id']) {
-        const usuario = await prisma.usuarios.findUnique({
+    public async obtenerUsuario(id: UsuarioType['id'], negocio_id: UsuarioType['negocio_id']) {
+        const usuario = await this.db.usuarios.findUnique({
             where: {
                 id: id,
+                negocio_id,
                 activo: true
             },
             select: usuarioDetalleSelector
@@ -38,11 +41,10 @@ class UsuarioServices {
         return usuario
     }
 
-    public async crearUsuario(data: UsuarioCrearType) {
-        const usuario = await prisma.usuarios.findUnique({
+    public async crearUsuario(data: UsuarioCrearType, negocio_id: UsuarioType['negocio_id']) {
+        const usuario = await this.db.usuarios.findUnique({
             where: {
-                telefono: data.telefono
-
+                telefono: data.telefono,
             }
         })
 
@@ -56,11 +58,12 @@ class UsuarioServices {
             ...data,
             id: crypto.randomUUID(),
             password_hash: hashedPassword,
+            negocio_id,
             verificado: false,
             activo: true
         }
 
-        const usuarioCreaado = await prisma.usuarios.create({
+        const usuarioCreaado = await this.db.usuarios.create({
             data: nuevoUsuario,
             select: usuarioDetalleSelector
         })
@@ -68,16 +71,16 @@ class UsuarioServices {
         return usuarioCreaado
     }
 
-    public async actualizarUsuario(id: UsuarioType['id'], data: Partial<UsuarioActualizarType>) {
+    public async actualizarUsuario(id: UsuarioType['id'], data: Partial<UsuarioActualizarType>, negocio_id: UsuarioType['negocio_id']) {
         try {
-            const usuarioActualizado = await prisma.usuarios.update({
+            const usuarioActualizado = await this.db.usuarios.update({
                 where: {
                     id: id,
+                    negocio_id,
                     activo: true
+
                 },
-                data: {
-                    ...data,
-                },
+                data: data,
                 select: usuarioDetalleSelector
             });
 
@@ -96,11 +99,12 @@ class UsuarioServices {
         }
     }
 
-    public async eliminarUsuario(id: UsuarioType['id']) {
+    public async eliminarUsuario(id: UsuarioType['id'], negocio_id: UsuarioType['negocio_id']) {
         try {
-            const usuarioEliminado = await prisma.usuarios.update({
+            const usuarioEliminado = await this.db.usuarios.update({
                 where: {
                     id: id,
+                    negocio_id,
                     activo: true
                 },
                 data: {

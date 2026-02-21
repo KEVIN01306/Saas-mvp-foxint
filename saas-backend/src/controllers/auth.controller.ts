@@ -4,14 +4,12 @@ import AuthService from "../services/auth.service.js";
 import Respuesta from "../helpers/Respuesta.js";
 import AppError from "../errors/AppError.js";
 import { loginSchema } from "../zod/auth.schema.js";
+import prisma from "../configs/db.config.js";
 
 
 class AuthController {
-    private readonly authService: AuthService;
 
-    constructor(authService: AuthService) {
-        this.authService = authService;
-    }
+    constructor(private readonly authService: AuthService) { }
 
     public login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -69,5 +67,5 @@ class AuthController {
     };
 }
 
-const authService = new AuthService();
+const authService = new AuthService(prisma);
 export default new AuthController(authService);

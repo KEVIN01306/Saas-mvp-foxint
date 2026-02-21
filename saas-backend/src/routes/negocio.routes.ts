@@ -9,9 +9,6 @@ const router = Router();
 
 router.use(authMiddleware.protegerRuta)
 
-router.get("/",
-    negocioController.obtenerNegocios
-);
 router.get("/:id",
     negocioController.obtenerNegocio
 );

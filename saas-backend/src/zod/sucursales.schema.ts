@@ -8,6 +8,6 @@ export const sucursalSchema = z.object({
     direccion: z.string().min(3, "La direccion debe tener al menos 3 caracteres"),
 });
 
-export const sucursalCrearSchema = sucursalSchema.omit({ id: true, es_principal: true });
+export const sucursalCrearSchema = sucursalSchema.omit({ id: true, negocio_id: true, es_principal: true });
 
-export const sucursalActualizarSchema = sucursalSchema.omit({ id: true, es_principal: true });
+export const sucursalActualizarSchema = sucursalSchema.omit({ id: true, negocio_id: true, es_principal: true });

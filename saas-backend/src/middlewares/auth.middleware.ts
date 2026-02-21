@@ -24,10 +24,13 @@ class AuthMiddleware {
 
             const payload = await this.jwtProvider.verifyToken(String(token));
 
-            (req as any).usuario = {
+            res.locals.usuario = {
                 id: payload.sub,
                 rol: payload.rol,
+                negocio_id: payload.negocio_id,
             };
+
+            (req as any).usuario = res.locals.usuario;
 
             next();
         } catch (error: any) {
@@ -35,7 +38,7 @@ class AuthMiddleware {
                 next(new AppError("El token ha expirado", "TOKEN_EXPIRED", 401));
                 return;
             }
-            
+
             if (error instanceof AppError) {
                 next(error);
             } else {

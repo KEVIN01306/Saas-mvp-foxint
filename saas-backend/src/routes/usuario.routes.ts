@@ -3,6 +3,7 @@ import usuariosController from "../controllers/usuario.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import ValidarMiddleware from "../middlewares/validar.middleware.js";
 import { usuarioActualizarSchema, usuariosCrearSchema } from "../zod/usuarios.schema.js";
+import { paginacionQuerySchema } from "../zod/paginacion.query.schema.js";
 
 const router = Router()
 
@@ -10,6 +11,7 @@ router.use(authMiddleware.protegerRuta)
 router.use(authMiddleware.verificarRol(['ADMIN']))
 
 router.get("/",
+    ValidarMiddleware.ValidarQuery(paginacionQuerySchema),
     usuariosController.obtenerUsuarios
 );
 router.get("/:id",

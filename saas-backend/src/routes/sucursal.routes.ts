@@ -3,6 +3,7 @@ import authMiddleware from "../middlewares/auth.middleware.js";
 import sucursalController from "../controllers/sucursal.controller.js";
 import validarMiddleware from "../middlewares/validar.middleware.js";
 import { sucursalActualizarSchema, sucursalCrearSchema } from "../zod/sucursales.schema.js";
+import { paginacionQuerySchema } from "../zod/paginacion.query.schema.js";
 
 const router = Router()
 
@@ -10,6 +11,7 @@ router.use(authMiddleware.protegerRuta)
 
 router.get("/",
     authMiddleware.verificarRol(['ADMIN', 'VENDEDOR']),
+    validarMiddleware.ValidarQuery(paginacionQuerySchema),
     sucursalController.obtenerSucursales
 );
 router.get("/:id",
