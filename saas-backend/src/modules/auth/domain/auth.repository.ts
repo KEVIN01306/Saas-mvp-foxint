@@ -1,14 +1,5 @@
+import type { UsuarioAutentificacion } from "./auth-user.entity.js";
 
-export interface UsuarioAutentificacion {
-    id: string,
-    nombre: string,
-    password_hash: string | null,
-    telefono: string,
-    rol: string,
-    activo: boolean | null,
-    negocio_id: string,
-}
-
-export interface AuthRespository {
+export interface AuthRepository {
     buscarPorTelefono(telefono: UsuarioAutentificacion['telefono']): Promise<UsuarioAutentificacion | null>
 }

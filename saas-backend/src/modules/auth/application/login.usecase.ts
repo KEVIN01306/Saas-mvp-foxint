@@ -1,6 +1,6 @@
 import AppError from "../../../errors/AppError.js";
 import type { HashProvider } from "../../../shared/domain/hash.provider.js";
-import type { AuthRespository } from "../domain/auth.repository.js";
+import type { AuthRepository } from "../domain/auth.repository.js";
 import type JwtProvider from "../domain/jwt.provider.js";
 
 
@@ -10,7 +10,7 @@ interface LoginDTO {
     password: string,
 }
 
-interface LoginResponse {
+interface LoginRespuesta {
     accessToken: string,
     refreshToken: string,
     usuario: {
@@ -23,12 +23,12 @@ interface LoginResponse {
 
 export class LoginUseCase {
     constructor(
-        private readonly authRepository: AuthRespository,
+        private readonly authRepository: AuthRepository,
         private readonly jwtProvider: JwtProvider,
         private readonly hashProvider: HashProvider
     ) { }
 
-    async execute(data: LoginDTO): Promise<LoginResponse> {
+    async execute(data: LoginDTO): Promise<LoginRespuesta> {
         const { telefono, password } = data
 
         const usuario = await this.authRepository.buscarPorTelefono(telefono)

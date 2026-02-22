@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
-import JwtProvider from "../../helpers/jwt.helper.js";
-import AppError from "../../errors/AppError.js";
+import JwtProvider from "../../modules/auth/domain/jwt.provider.js";
+import AppError from "../../shared/errors/AppError.js";
 
-class AuthMiddleware {
+export class AuthMiddleware {
     private readonly jwtProvider: JwtProvider;
 
     constructor() {
@@ -62,5 +62,3 @@ class AuthMiddleware {
         };
     };
 }
-
-export default new AuthMiddleware();

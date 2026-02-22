@@ -1,8 +1,9 @@
 import type { PrismaClient } from "@prisma/client";
-import type { AuthRespository, UsuarioAutentificacion } from "../domain/auth.repository.js";
+import type { AuthRepository } from "../domain/auth.repository.js";
+import type { UsuarioAutentificacion } from "../domain/auth-user.entity.js";
 
 
-export class PrismaAuthRespository implements AuthRespository {
+export class PrismaAuthRespository implements AuthRepository {
 
     constructor(private readonly db: PrismaClient) { }
 
