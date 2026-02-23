@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ValidarMiddleware } from "../../../app/middlewares/ValidarMiddleware.js";
 import { AuthMiddleware } from "../../../app/middlewares/AuthMiddleware.js";
 import { usuarioController } from "../usuario.module.js";
+import { usuariosCrearSchema } from "./validators/usuario.schema.js";
 
 const router = Router()
 
@@ -16,8 +17,13 @@ router.get('/',
 )
 
 
-router.get('/:id', 
+router.get('/:id',
     usuarioController.buscarPorId
+)
+
+router.post('/',
+    validarMiddleware.validarBody(usuariosCrearSchema),
+    usuarioController.crear
 )
 
 export default router;

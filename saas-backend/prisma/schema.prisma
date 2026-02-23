@@ -244,7 +244,7 @@ model sucursales {
 }
 
 model usuarios {
-  id                   String                 @id @db.Char(36)
+  id                   String                 @id @default(uuid()) @db.Char(36)
   negocio_id           String                 @db.Char(36)
   nombre               String                 @db.VarChar(100)
   telefono             String                 @unique(map: "telefono") @db.VarChar(20)
