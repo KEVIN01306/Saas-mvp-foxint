@@ -1,24 +1,26 @@
-import { PrismaClient } from "@prisma/client";
-import { PrismaUsuarioRepository } from "./infrastructure/prisma.usuario.repository.js";
+import { PrismaUsuarioRepository } from "./infrastructure/prisma-usuario.repository.js";
 import { BuscarPorIdUseCase } from "./application/buscar-por-id.usecase.js";
 import { UsuarioController } from "./presentation/usuario.controller.js";
 import { BuscarPorNegocioUseCase } from "./application/buscar-por-negocio.usecase.js";
 import { CrearUsuarioUseCase } from "./application/crear.usecase.js";
+import { ActualizarUsuarioUseCase } from "./application/actualizar.usecase.js";
+import { EliminarUsuarioUseCase } from "./application/eliminar.usecase.js";
+import prisma from "@infrastructure/config/prisma.js";
 
 
+const usuarioRepository = new PrismaUsuarioRepository(prisma);
 
-const prisma = new PrismaClient();
-
-const usuarioRepositoy = new PrismaUsuarioRepository(prisma);
-
-const buscarPorIdUseCase = new BuscarPorIdUseCase(usuarioRepositoy);
-const buscarPorNegocioUseCase = new BuscarPorNegocioUseCase(usuarioRepositoy);
-const crearUsuarioUseCase = new CrearUsuarioUseCase(usuarioRepositoy)
-
+const buscarPorIdUseCase = new BuscarPorIdUseCase(usuarioRepository);
+const buscarPorNegocioUseCase = new BuscarPorNegocioUseCase(usuarioRepository);
+const crearUsuarioUseCase = new CrearUsuarioUseCase(usuarioRepository)
+const actualizarUsuarioUseCase = new ActualizarUsuarioUseCase(usuarioRepository)
+const eliminarUsuarioUseCase = new EliminarUsuarioUseCase(usuarioRepository)
 
 export const usuarioController = new UsuarioController(
     buscarPorIdUseCase,
     buscarPorNegocioUseCase,
-    crearUsuarioUseCase
+    crearUsuarioUseCase,
+    actualizarUsuarioUseCase,
+    eliminarUsuarioUseCase
 );
 

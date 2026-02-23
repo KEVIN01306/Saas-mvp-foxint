@@ -4,6 +4,8 @@ import type { UsuarioRepository } from "../domain/usuario.repository.js";
 
 interface BuscarPorIdParams {
     negocio_id: string
+    page: number
+    perPage: number
 }
 
 interface BuscarPorNegocioRespuesta extends UsuarioSimple { }
@@ -14,15 +16,17 @@ export class BuscarPorNegocioUseCase {
         private readonly usuarioRepository: UsuarioRepository
     ) { }
 
-    async execute({ negocio_id }: BuscarPorIdParams): Promise<BuscarPorNegocioRespuesta[]> {
+    async execute({ negocio_id, page, perPage }: BuscarPorIdParams): Promise<{ total: number, usuarios: BuscarPorNegocioRespuesta[] }> {
 
-        const usuarios = await this.usuarioRepository.buscarPorNegocio(negocio_id)
+        const { total, data } = await this.usuarioRepository.buscarPorNegocio(negocio_id, { page, perPage })
 
-        return usuarios.map(usuario => ({
-            id: usuario.id,
-            nombre: usuario.nombre,
-            telefono: usuario.telefono,
-            rol: usuario.rol,
-        }))
+        return {
+            total, usuarios: data.map(usuario => ({
+                id: usuario.id,
+                nombre: usuario.nombre,
+                telefono: usuario.telefono,
+                rol: usuario.rol,
+            }))
+        }
     }
 }

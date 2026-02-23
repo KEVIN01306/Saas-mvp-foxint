@@ -13,6 +13,27 @@
     "types": [
       "node"
     ], // Asegúrate de haber instalado @types/node
+    "baseUrl": "./src",
+    "paths": {
+      "@app/*": [
+        "app/*"
+      ],
+      "@domain/*": [
+        "domain/*"
+      ],
+      "@application/*": [
+        "application/*"
+      ],
+      "@infrastructure/*": [
+        "infrastructure/*"
+      ],
+      "@presentation/*": [
+        "presentation/*"
+      ],
+      "@shared/*": [
+        "shared/*"
+      ]
+    },
     /* Salidas y Mapas */
     "sourceMap": true,
     "declaration": true,

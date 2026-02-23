@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
-import AppError from '../../../shared/errors/AppError.js';
+import AppError from '@shared/errors/AppError.js';
 
 
 class JwtProvider {

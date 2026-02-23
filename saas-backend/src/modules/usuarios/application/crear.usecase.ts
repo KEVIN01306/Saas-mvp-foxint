@@ -1,4 +1,6 @@
-import AppError from "../../../errors/AppError.js";
+import AppError from "@shared/errors/AppError.js";
+import { DatabaseError } from "@shared/database/errors/DatabaseError.js";
+import { UniqueConstraintError } from "@shared/database/errors/UniqueConstraintError.js";
 import type { Usuario, UsuarioCrear, UsuarioSimple } from "../domain/usuario.entity.js";
 import type { UsuarioRepository } from "../domain/usuario.repository.js";
 
@@ -9,19 +11,28 @@ export class CrearUsuarioUseCase {
     ) { }
 
     async execute(data: UsuarioCrear, negocio_id: Usuario["negocio_id"]): Promise<UsuarioSimple> {
+        try {
 
-        const usuarioExistente = await this.usuarioRepository.buscarPorTelefono(data.telefono)
-        if (usuarioExistente) throw new AppError('El usuario ya existe', 'DATA_ALREADY_EXISTS', 409)
+            const usuario = {
+                ...data,
+                activo: true,
+                verificado: false
+            }
 
+            const usuarioNuevo = await this.usuarioRepository.crear(usuario, negocio_id)
 
-        const usuario = {
-            ...data,
-            activo: true,
-            verificado: false
+            return usuarioNuevo
+        } catch (error) {
+            if (error instanceof UniqueConstraintError) {
+                throw new AppError('El usuario ya existe', 'DATA_ALREADY_EXISTS', 409)
+            }
+
+            if (error instanceof DatabaseError) {
+                throw new AppError('Error en base de datos', 'DATABASE_ERROR', 500)
+            }
+
+            throw error
         }
 
-        const usuarioNuevo = await this.usuarioRepository.crear(usuario, negocio_id)
-
-        return usuarioNuevo
     }
-}
+}   

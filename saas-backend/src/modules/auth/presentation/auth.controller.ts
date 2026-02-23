@@ -1,4 +1,4 @@
-import Respuesta from "../../../app/http/respuesta.js";
+import Respuesta from "@app/http/respuesta.js";
 import type { LoginUseCase } from "../application/login.usecase.js";
 import type { Request, Response, NextFunction } from "express";
 

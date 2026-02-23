@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { ValidarMiddleware } from "../../../app/middlewares/ValidarMiddleware.js";
-import { AuthMiddleware } from "../../../app/middlewares/AuthMiddleware.js";
+import { ValidarMiddleware } from "@app/middlewares/ValidarMiddleware.js";
+import { AuthMiddleware } from "@app/middlewares/AuthMiddleware.js";
 import { usuarioController } from "../usuario.module.js";
 import { usuariosCrearSchema } from "./validators/usuario.schema.js";
+import { usuarioActualizarSchema } from "./validators/usuario.schema.js";
+import { paginacionQuerySchema } from "@shared/presentation/validators/paginacion.query.schema.js";
 
 const router = Router()
 
@@ -13,6 +15,7 @@ router.use(authMiddleware.protegerRuta)
 router.use(authMiddleware.verificarRol(['ADMIN']))
 
 router.get('/',
+    validarMiddleware.validarQuery(paginacionQuerySchema),
     usuarioController.buscarPorNegocio
 )
 
@@ -24,6 +27,15 @@ router.get('/:id',
 router.post('/',
     validarMiddleware.validarBody(usuariosCrearSchema),
     usuarioController.crear
+)
+
+router.put('/:id',
+    validarMiddleware.validarBody(usuarioActualizarSchema),
+    usuarioController.actualizar
+)
+
+router.delete('/:id',
+    usuarioController.eliminar
 )
 
 export default router;

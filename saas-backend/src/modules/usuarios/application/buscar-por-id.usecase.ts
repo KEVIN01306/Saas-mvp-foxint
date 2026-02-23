@@ -1,4 +1,4 @@
-import AppError from "../../../shared/errors/AppError.js";
+import AppError from "@shared/errors/AppError.js";
 import type { UsuarioObtenidoDetalle } from "../domain/usuario.entity.js";
 import type { UsuarioRepository } from "../domain/usuario.repository.js";
 
@@ -8,15 +8,15 @@ interface BuscarPorIdParams {
     negocio_id: string
 }
 
-interface BuscarPorIdRespuesta extends UsuarioObtenidoDetalle {}
+interface BuscarPorIdRespuesta extends UsuarioObtenidoDetalle { }
 
 export class BuscarPorIdUseCase {
 
-    constructor (
+    constructor(
         private readonly usuarioRepository: UsuarioRepository
-    ) {}
+    ) { }
 
-    async execute({ id, negocio_id }: BuscarPorIdParams ): Promise<BuscarPorIdRespuesta> {
+    async execute({ id, negocio_id }: BuscarPorIdParams): Promise<BuscarPorIdRespuesta> {
 
         const usuario = await this.usuarioRepository.buscarPorId(id, negocio_id)
 

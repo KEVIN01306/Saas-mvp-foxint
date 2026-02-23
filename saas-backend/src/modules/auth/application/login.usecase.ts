@@ -1,5 +1,5 @@
-import AppError from "../../../errors/AppError.js";
-import type { HashProvider } from "../../../shared/domain/hash.provider.js";
+import AppError from "@shared/errors/AppError.js";
+import type { HashProvider } from "@shared/domain/hash.provider.js";
 import type { AuthRepository } from "../domain/auth.repository.js";
 import type JwtProvider from "../domain/jwt.provider.js";
 

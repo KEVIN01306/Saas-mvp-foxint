@@ -8,7 +8,7 @@ datasource db {
 }
 
 model categorias {
-  id          String      @id @db.Char(36)
+  id          String      @id @default(uuid()) @db.Char(36)
   negocio_id  String      @db.Char(36)
   nombre      String      @db.VarChar(50)
   descripcion String?     @db.VarChar(255)
@@ -19,7 +19,7 @@ model categorias {
 }
 
 model clientes {
-  id                String    @id @db.Char(36)
+  id                String    @id @default(uuid()) @db.Char(36)
   negocio_id        String    @db.Char(36)
   nombre            String?   @db.VarChar(100)
   telefono          String    @db.VarChar(20)
@@ -44,7 +44,7 @@ model codigos_verificacion {
 }
 
 model compras {
-  id              String            @id @db.Char(36)
+  id              String            @id @default(uuid()) @db.Char(36)
   negocio_id      String            @db.Char(36)
   sucursal_id     String            @db.Char(36)
   proveedor_id    String?           @db.Char(36)
@@ -61,7 +61,7 @@ model compras {
 }
 
 model detalle_compras {
-  id             String  @id @db.Char(36)
+  id             String  @id @default(uuid()) @db.Char(36)
   compra_id      String  @db.Char(36)
   sku_id         String  @db.Char(36)
   cantidad       Int
@@ -74,7 +74,7 @@ model detalle_compras {
 }
 
 model detalle_ventas {
-  id                  String   @id @db.Char(36)
+  id                  String   @id @default(uuid()) @db.Char(36)
   venta_id            String   @db.Char(36)
   sku_id              String   @db.Char(36)
   cantidad            Int
@@ -89,7 +89,7 @@ model detalle_ventas {
 }
 
 model gastos {
-  id              String                  @id @db.Char(36)
+  id              String                  @id @default(uuid()) @db.Char(36)
   negocio_id      String                  @db.Char(36)
   sucursal_id     String                  @db.Char(36)
   monto           Decimal                 @db.Decimal(12, 2)
@@ -104,7 +104,7 @@ model gastos {
 }
 
 model inventario_stock {
-  id                  String     @id @db.Char(36)
+  id                  String     @id @default(uuid()) @db.Char(36)
   sku_id              String     @db.Char(36)
   sucursal_id         String     @db.Char(36)
   cantidad_disponible Int?       @default(0)
@@ -117,7 +117,7 @@ model inventario_stock {
 }
 
 model negocios {
-  id                     String        @id @db.Char(36)
+  id                     String        @id @default(uuid()) @db.Char(36)
   nombre_comercial       String        @db.VarChar(100)
   wa_id                  String        @unique(map: "wa_id") @db.VarChar(20)
   nit_rut                String?       @db.VarChar(20)
@@ -138,7 +138,7 @@ model negocios {
 }
 
 model producto_imagenes {
-  id           String    @id @db.Char(36)
+  id           String    @id @default(uuid()) @db.Char(36)
   producto_id  String    @db.Char(36)
   sku_id       String?   @db.Char(36)
   url_imagen   String    @db.Text
@@ -151,7 +151,7 @@ model producto_imagenes {
 }
 
 model productos {
-  id                String              @id @db.Char(36)
+  id                String              @id @default(uuid()) @db.Char(36)
   negocio_id        String              @db.Char(36)
   categoria_id      String?             @db.Char(36)
   nombre            String              @db.VarChar(150)
@@ -176,7 +176,7 @@ model promocion_skus {
 }
 
 model promociones {
-  id             String           @id @db.Char(36)
+  id             String           @id @default(uuid()) @db.Char(36)
   negocio_id     String           @db.Char(36)
   nombre         String?          @db.VarChar(100)
   tipo           promociones_tipo
@@ -191,7 +191,7 @@ model promociones {
 }
 
 model proveedores {
-  id         String    @id @db.Char(36)
+  id         String    @id @default(uuid()) @db.Char(36)
   negocio_id String    @db.Char(36)
   nombre     String    @db.VarChar(100)
   telefono   String?   @db.VarChar(20)
@@ -202,7 +202,7 @@ model proveedores {
 }
 
 model sku_variantes {
-  id              String @id @db.Char(36)
+  id              String @id @default(uuid()) @db.Char(36)
   sku_id          String @db.Char(36)
   nombre_atributo String @db.VarChar(50)
   valor_atributo  String @db.VarChar(50)
@@ -212,7 +212,7 @@ model sku_variantes {
 }
 
 model skus {
-  id                    String              @id @db.Char(36)
+  id                    String              @id @default(uuid()) @db.Char(36)
   producto_id           String              @db.Char(36)
   codigo_barras         String?             @db.VarChar(50)
   precio_venta          Decimal?            @default(0.00) @db.Decimal(12, 2)
@@ -229,7 +229,7 @@ model skus {
 }
 
 model sucursales {
-  id               String             @id @db.Char(36)
+  id               String             @id @default(uuid()) @db.Char(36)
   negocio_id       String             @db.Char(36)
   nombre           String             @db.VarChar(100)
   es_principal     Boolean?           @default(true)
@@ -260,7 +260,7 @@ model usuarios {
 }
 
 model ventas {
-  id              String           @id @db.Char(36)
+  id              String           @id @default(uuid()) @db.Char(36)
   negocio_id      String           @db.Char(36)
   sucursal_id     String           @db.Char(36)
   usuario_id      String?          @db.Char(36)
