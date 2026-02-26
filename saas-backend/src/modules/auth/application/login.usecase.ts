@@ -58,6 +58,15 @@ export class LoginUseCase {
 
         const { accessToken, refreshToken } = await this.jwtProvider.generateTokens(usuario.id, usuario.rol, usuario.negocio_id)
 
+        const fechaExpiracion = new Date();
+        fechaExpiracion.setDate(fechaExpiracion.getDate() + 7);
+
+        await this.authRepository.actualizarCrearSesion(
+            usuario.id,
+            refreshToken,
+            fechaExpiracion
+        )
+
         return {
             accessToken,
             refreshToken,

@@ -10,11 +10,15 @@
     "db:migrate": "npx prisma migrate dev",
     "db:studio": "npx prisma studio"
   },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
   "author": "kevin-sanchez",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.19.2",
     "argon2": "^0.44.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",

@@ -6,13 +6,15 @@ import { CrearUsuarioUseCase } from "./application/crear.usecase.js";
 import { ActualizarUsuarioUseCase } from "./application/actualizar.usecase.js";
 import { EliminarUsuarioUseCase } from "./application/eliminar.usecase.js";
 import prisma from "@infrastructure/config/prisma.js";
+import { Argon2HashProvider } from "@shared/infrastructure/argon2-hash.provider.js";
 
 
 const usuarioRepository = new PrismaUsuarioRepository(prisma);
+const hashProvider = new Argon2HashProvider()
 
 const buscarPorIdUseCase = new BuscarPorIdUseCase(usuarioRepository);
 const buscarPorNegocioUseCase = new BuscarPorNegocioUseCase(usuarioRepository);
-const crearUsuarioUseCase = new CrearUsuarioUseCase(usuarioRepository)
+const crearUsuarioUseCase = new CrearUsuarioUseCase(usuarioRepository, hashProvider)
 const actualizarUsuarioUseCase = new ActualizarUsuarioUseCase(usuarioRepository)
 const eliminarUsuarioUseCase = new EliminarUsuarioUseCase(usuarioRepository)
 
@@ -23,4 +25,3 @@ export const usuarioController = new UsuarioController(
     actualizarUsuarioUseCase,
     eliminarUsuarioUseCase
 );
-

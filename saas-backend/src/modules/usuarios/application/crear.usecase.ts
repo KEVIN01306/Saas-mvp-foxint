@@ -3,19 +3,24 @@ import { DatabaseError } from "@shared/database/errors/DatabaseError.js";
 import { UniqueConstraintError } from "@shared/database/errors/UniqueConstraintError.js";
 import type { Usuario, UsuarioCrear, UsuarioSimple } from "../domain/usuario.entity.js";
 import type { UsuarioRepository } from "../domain/usuario.repository.js";
+import type { HashProvider } from "@shared/domain/hash.provider.js";
 
 
 export class CrearUsuarioUseCase {
     constructor(
-        private readonly usuarioRepository: UsuarioRepository
+        private readonly usuarioRepository: UsuarioRepository,
+        private readonly hashProvider: HashProvider
     ) { }
 
     async execute(data: UsuarioCrear, negocio_id: Usuario["negocio_id"]): Promise<UsuarioSimple> {
         try {
 
+            const password_hash = await this.hashProvider.hash(String(data.password_hash));
+
             const usuario = {
                 ...data,
                 activo: true,
+                password_hash,
                 verificado: false
             }
 
