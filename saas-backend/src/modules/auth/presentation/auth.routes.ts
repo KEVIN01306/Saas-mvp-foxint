@@ -11,5 +11,8 @@ router.post('/login',
     validarMiddleware.validarBody(loginSchema),
     authController.login)
 
+router.post('/refresh',
+    authController.refresh
+)
 
 export default router;
