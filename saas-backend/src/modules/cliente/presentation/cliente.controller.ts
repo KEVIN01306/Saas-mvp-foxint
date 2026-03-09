@@ -1,51 +1,52 @@
 import type { NextFunction, Request, Response } from "express";
-import type { BuscarPorIdUseCase } from "../application/buscar-por-id.usecase.js";
+import type { ObtenerClienteUseCase } from "../application/obtener-cliente.usecase.js";
 import BaseController from "../../../shared/presentation/base.controller.js";
 import Respuesta from "../../../app/http/respuesta.js";
-import type { BuscarPorNegocioUseCase } from "../application/buscar-por-negocio.usecase.js";
-import type { CrearClienteUseCase } from "../application/crear.usecase.js";
-import type { ActualizarClienteUseCase } from "../application/actualizar.usecase.js";
-import type { EliminarClienteUseCase } from "../application/eliminar.usecase.js";
+import type { ObtenerClientesUseCase } from "../application/obtener-clientes.js";
+import type { RegistrarClienteUseCase } from "../application/registrar-cliente.usecase.js";
+import type { ActualizarClienteUseCase } from "../application/actualizar-cliente.usecase.js";
+import type { EliminarClienteUseCase } from "../application/eliminar-cliente.usecase.js";
+
 
 export class ClienteController extends BaseController {
 
     constructor(
-        private readonly buscarPorIdUseCase: BuscarPorIdUseCase,
-        private readonly buscarPorNegocioUseCase: BuscarPorNegocioUseCase,
-        private readonly crearClienteUseCase: CrearClienteUseCase,
+        private readonly obtenerClienteUseCase: ObtenerClienteUseCase,
+        private readonly obtenerClientesUseCase: ObtenerClientesUseCase,
+        private readonly registrarClienteUseCase: RegistrarClienteUseCase,
         private readonly actualizarClienteUseCase: ActualizarClienteUseCase,
         private readonly eliminarClienteUseCase: EliminarClienteUseCase
     ) {
         super()
     }
 
-    buscarPorId = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+    obtener = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params
             const { negocio_id } = this.obtenerEntorno(res)
-            const cliente = await this.buscarPorIdUseCase.execute(id, negocio_id);
+            const cliente = await this.obtenerClienteUseCase.execute(id, negocio_id);
             res.status(200).json(Respuesta.exito('Cliente obtenido con exito', cliente))
         } catch (error) {
             next(error)
         }
     }
 
-    buscarPorNegocio = async (_req: Request, res: Response, next: NextFunction) => {
+    listar = async (_req: Request, res: Response, next: NextFunction) => {
         try {
             const { negocio_id } = this.obtenerEntorno(res)
             const { limit, offset } = res.locals.query
             const page = Math.floor(offset / limit) + 1
-            const { total, data } = await this.buscarPorNegocioUseCase.execute({ negocio_id, page, perPage: limit });
+            const { total, data } = await this.obtenerClientesUseCase.execute({ negocio_id, page, perPage: limit });
             res.status(200).json(Respuesta.paginacion('Clientes obtenidos con exito', data, total, limit, offset))
         } catch (error) {
             next(error)
         }
     }
 
-    crear = async (req: Request, res: Response, next: NextFunction) => {
+    registrar = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { negocio_id } = this.obtenerEntorno(res)
-            const cliente = await this.crearClienteUseCase.execute(req.body, negocio_id)
+            const cliente = await this.registrarClienteUseCase.execute(req.body, negocio_id)
             res.status(201).json(Respuesta.exito('Cliente creado con exito', cliente))
         } catch (error) {
             next(error)

@@ -8,7 +8,7 @@ import { ProveedorMapper } from "./mappers/proveedor.mapper.js";
 export class PrismaProveedorRepository implements ProveedorRepository {
     constructor(private readonly prisma: PrismaClient) { }
 
-    async crear(data: ProveedorCrear, negocio_id: string): Promise<ProveedorObtenidoDetalle> {
+    async registrar(data: ProveedorCrear, negocio_id: string): Promise<ProveedorObtenidoDetalle> {
         try {
             const proveedor = await this.prisma.proveedores.create({
                 data: {
@@ -48,7 +48,7 @@ export class PrismaProveedorRepository implements ProveedorRepository {
         }
     }
 
-    async buscarPorId(id: string, negocio_id: string): Promise<ProveedorObtenidoDetalle | null> {
+    async obtener(id: string, negocio_id: string): Promise<ProveedorObtenidoDetalle | null> {
         try {
             const proveedor = await this.prisma.proveedores.findUnique({
                 where: { id, negocio_id },
@@ -65,7 +65,7 @@ export class PrismaProveedorRepository implements ProveedorRepository {
         }
     }
 
-    async buscarPorNegocio(params: { negocio_id: string; page: number; perPage: number }): Promise<Paginated<ProveedorSimple>> {
+    async listar(params: { negocio_id: string; page: number; perPage: number }): Promise<Paginated<ProveedorSimple>> {
         try {
             const { negocio_id, page, perPage } = params;
             const skip = (page - 1) * perPage;

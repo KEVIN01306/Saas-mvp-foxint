@@ -6,19 +6,9 @@ export interface Sucursal {
     direccion: string | null;
 }
 
-export interface SucursalObtenidoDetalle extends Omit<Sucursal, "negocio_id"> {
-    negocio: {
-        id: string;
-        nombre_comercial: string;
-    };
-}
+export interface SucursalObtenidoDetalle extends Omit<Sucursal, "negocio_id"> { }
 
-export interface SucursalSimple extends Omit<Sucursal, "negocio_id"> {
-    negocio: {
-        id: string;
-        nombre_comercial: string;
-    }
-}
+export interface SucursalSimple extends Omit<Sucursal, "negocio_id"> { }
 
 export interface SucursalCrear extends Omit<Sucursal, "id" | "negocio_id" | "es_principal"> { }
 

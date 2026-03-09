@@ -12,12 +12,7 @@ export interface Usuario {
     negocio_id: string,
 }
 
-export interface UsuarioObtenidoDetalle extends Omit<Usuario, "password_hash" | "negocio_id" | "activo"> {
-    negocio: {
-        id: string,
-        nombre_comercial: string
-    }
-}
+export interface UsuarioObtenidoDetalle extends Omit<Usuario, "password_hash" | "negocio_id" | "activo"> { }
 
 
 export interface UsuarioSimple extends Omit<Usuario, "password_hash" | "negocio_id" | "activo" | "verificado"> { }

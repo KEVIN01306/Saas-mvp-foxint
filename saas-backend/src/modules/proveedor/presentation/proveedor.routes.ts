@@ -15,16 +15,16 @@ router.use(authMiddleware.verificarRol(['ADMIN']))
 
 router.get('/',
     validarMiddleware.validarQuery(paginacionQuerySchema),
-    proveedorController.buscarPorNegocio
+    proveedorController.listar
 );
 
 router.get('/:id',
-    proveedorController.buscarPorId
+    proveedorController.obtener
 );
 
 router.post('/',
     validarMiddleware.validarBody(proveedorCrearSchema),
-    proveedorController.crear
+    proveedorController.registrar
 );
 
 router.put('/:id',

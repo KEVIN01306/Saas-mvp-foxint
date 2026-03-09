@@ -14,10 +14,6 @@ export class ClienteMapper {
             email: cliente.email,
             direccion_entrega: cliente.direccion_entrega,
             fecha_registro: cliente.fecha_registro,
-            negocio: {
-                id: cliente.negocios.id,
-                nombre_comercial: cliente.negocios.nombre_comercial,
-            },
         };
     }
 
@@ -26,10 +22,7 @@ export class ClienteMapper {
             id: cliente.id,
             nombre: cliente.nombre,
             telefono: cliente.telefono,
-            negocio: {
-                id: cliente.negocios.id,
-                nombre_comercial: cliente.negocios.nombre_comercial,
-            },
+            email: cliente.email,
         };
     }
 }

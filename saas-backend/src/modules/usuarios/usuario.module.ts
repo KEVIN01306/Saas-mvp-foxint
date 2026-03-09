@@ -1,10 +1,10 @@
+import { ActualizarUsuarioUseCase } from "./application/actualizar-usuario.usecase.js";
+import { EliminarUsuarioUseCase } from "./application/eliminar-usuario.usecase.js";
+import { ObtenerUsuarioUseCase } from "./application/obtener-usuario.usecase.js";
+import { ObtenerUsuariosUseCase } from "./application/obtener-usuarios.usecase.js";
+import { RegistrarUsuarioUseCase } from "./application/registrar-usuario.usecase.js";
 import { PrismaUsuarioRepository } from "./infrastructure/prisma-usuario.repository.js";
-import { BuscarPorIdUseCase } from "./application/buscar-por-id.usecase.js";
 import { UsuarioController } from "./presentation/usuario.controller.js";
-import { BuscarPorNegocioUseCase } from "./application/buscar-por-negocio.usecase.js";
-import { CrearUsuarioUseCase } from "./application/crear.usecase.js";
-import { ActualizarUsuarioUseCase } from "./application/actualizar.usecase.js";
-import { EliminarUsuarioUseCase } from "./application/eliminar.usecase.js";
 import prisma from "@infrastructure/config/prisma.js";
 import { Argon2HashProvider } from "@shared/infrastructure/argon2-hash.provider.js";
 
@@ -12,16 +12,16 @@ import { Argon2HashProvider } from "@shared/infrastructure/argon2-hash.provider.
 const usuarioRepository = new PrismaUsuarioRepository(prisma);
 const hashProvider = new Argon2HashProvider()
 
-const buscarPorIdUseCase = new BuscarPorIdUseCase(usuarioRepository);
-const buscarPorNegocioUseCase = new BuscarPorNegocioUseCase(usuarioRepository);
-const crearUsuarioUseCase = new CrearUsuarioUseCase(usuarioRepository, hashProvider)
+const obtenerUsuarioUseCase = new ObtenerUsuarioUseCase(usuarioRepository);
+const obtenerUsuariosUseCase = new ObtenerUsuariosUseCase(usuarioRepository);
+const registrarUsuarioUseCase = new RegistrarUsuarioUseCase(usuarioRepository, hashProvider)
 const actualizarUsuarioUseCase = new ActualizarUsuarioUseCase(usuarioRepository)
 const eliminarUsuarioUseCase = new EliminarUsuarioUseCase(usuarioRepository)
 
 export const usuarioController = new UsuarioController(
-    buscarPorIdUseCase,
-    buscarPorNegocioUseCase,
-    crearUsuarioUseCase,
+    obtenerUsuarioUseCase,
+    obtenerUsuariosUseCase,
+    registrarUsuarioUseCase,
     actualizarUsuarioUseCase,
     eliminarUsuarioUseCase
 );

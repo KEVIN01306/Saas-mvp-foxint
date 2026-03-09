@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import {Argon2HashProvider} from '../src/shared/infrastructure/argon2-hash.provider'
+import { Argon2HashProvider } from '../src/shared/infrastructure/argon2-hash.provider'
 
 const prisma = new PrismaClient();
 
@@ -36,11 +36,11 @@ async function main() {
 
 
 main()
-.then(async () => {
-    await prisma.$disconnect();
-})
-.catch( async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-})
+    .then(async () => {
+        await prisma.$disconnect();
+    })
+    .catch(async (e) => {
+        console.error(e);
+        await prisma.$disconnect();
+        process.exit(1);
+    })

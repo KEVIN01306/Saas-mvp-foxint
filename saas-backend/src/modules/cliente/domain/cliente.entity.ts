@@ -8,19 +8,9 @@ export interface Cliente {
     fecha_registro: Date | null;
 }
 
-export interface ClienteObtenidoDetalle extends Omit<Cliente, "negocio_id"> {
-    negocio: {
-        id: string;
-        nombre_comercial: string;
-    };
-}
+export interface ClienteObtenidoDetalle extends Omit<Cliente, "negocio_id"> { }
 
-export interface ClienteSimple extends Pick<Cliente, "id" | "nombre" | "telefono"> {
-    negocio: {
-        id: string;
-        nombre_comercial: string;
-    }
-}
+export interface ClienteSimple extends Pick<Cliente, "id" | "nombre" | "telefono" | "email"> { }
 
 export interface ClienteCrear extends Omit<Cliente, "id" | "fecha_registro" | "negocio_id"> { }
 

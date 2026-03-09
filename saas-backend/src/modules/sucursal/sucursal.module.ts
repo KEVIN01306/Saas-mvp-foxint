@@ -1,24 +1,24 @@
+import { ActualizarSucursalUseCase } from "./application/actualizar-sucurrsal.usecase.js";
+import { EliminarSucursalUseCase } from "./application/eliminar-sucursal.usecase.js";
+import { ObtenerSucursalUseCase } from "./application/obtener-sucurrsal.usecase.js";
+import { ObtenerSucursalesUseCase } from "./application/obtener-sucurrsales.usecase.js";
+import { RegistrarSucursalUseCase } from "./application/registrar-sucurrsal.usecase.js";
 import { PrismaSucursalRepository } from "./infrastructure/prisma-sucursal.repository.js";
-import { BuscarPorIdUseCase } from "./application/buscar-por-id.usecase.js";
-import { BuscarPorNegocioUseCase } from "./application/buscar-por-negocio.usecase.js";
-import { CrearSucursalUseCase } from "./application/crear.usecase.js";
-import { ActualizarSucursalUseCase } from "./application/actualizar.usecase.js";
-import { EliminarSucursalUseCase } from "./application/eliminar.usecase.js";
 import { SucursalController } from "./presentation/sucursal.controller.js";
 import prisma from "@infrastructure/config/prisma.js";
 
 const sucursalRepository = new PrismaSucursalRepository(prisma);
 
-const buscarPorIdUseCase = new BuscarPorIdUseCase(sucursalRepository);
-const buscarPorNegocioUseCase = new BuscarPorNegocioUseCase(sucursalRepository);
-const crearSucursalUseCase = new CrearSucursalUseCase(sucursalRepository);
+const obtenerSucursalUseCase = new ObtenerSucursalUseCase(sucursalRepository);
+const obtenerSucursalesUseCase = new ObtenerSucursalesUseCase(sucursalRepository);
+const registrarSucursalUseCase = new RegistrarSucursalUseCase(sucursalRepository);
 const actualizarSucursalUseCase = new ActualizarSucursalUseCase(sucursalRepository);
 const eliminarSucursalUseCase = new EliminarSucursalUseCase(sucursalRepository);
 
 export const sucursalController = new SucursalController(
-    buscarPorIdUseCase,
-    buscarPorNegocioUseCase,
-    crearSucursalUseCase,
+    obtenerSucursalUseCase,
+    obtenerSucursalesUseCase,
+    registrarSucursalUseCase,
     actualizarSucursalUseCase,
     eliminarSucursalUseCase
 );

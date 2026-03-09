@@ -4,11 +4,12 @@ import type { Paginated } from "@shared/domain/paginated.js";
 import type { SucursalActualizar, SucursalCrear, SucursalCrearPersistencia, SucursalObtenidoDetalle, SucursalSimple } from "../domain/sucursal.entity.js";
 import type { SucursalRepository } from "../domain/sucursal.repository.js";
 import { SucursalMapper } from "./mappers/sucursal.mapper.js";
+import type { Pagination } from "@shared/domain/pagination.js";
 
 export class PrismaSucursalRepository implements SucursalRepository {
     constructor(private readonly prisma: PrismaClient) { }
 
-    async contarPorNegocio(negocio_id: string): Promise<number> {
+    async contar(negocio_id: string): Promise<number> {
         try {
             return await this.prisma.sucursales.count({ where: { negocio_id } });
         } catch (error) {
@@ -16,7 +17,7 @@ export class PrismaSucursalRepository implements SucursalRepository {
         }
     }
 
-    async crear(data: SucursalCrearPersistencia, negocio_id: string): Promise<SucursalObtenidoDetalle> {
+    async registrar(data: SucursalCrearPersistencia, negocio_id: string): Promise<SucursalObtenidoDetalle> {
         try {
             const sucursal = await this.prisma.sucursales.create({
                 data: {
@@ -56,7 +57,7 @@ export class PrismaSucursalRepository implements SucursalRepository {
         }
     }
 
-    async buscarPorId(id: string, negocio_id: string): Promise<SucursalObtenidoDetalle | null> {
+    async obtener(id: string, negocio_id: string): Promise<SucursalObtenidoDetalle | null> {
         try {
             const sucursal = await this.prisma.sucursales.findUnique({
                 where: { id, negocio_id },
@@ -73,9 +74,9 @@ export class PrismaSucursalRepository implements SucursalRepository {
         }
     }
 
-    async buscarPorNegocio(params: { negocio_id: string; page: number; perPage: number }): Promise<Paginated<SucursalSimple>> {
+    async listar(negocio_id: string, pagination: Pagination): Promise<Paginated<SucursalSimple>> {
         try {
-            const { negocio_id, page, perPage } = params;
+            const { page, perPage } = pagination;
             const skip = (page - 1) * perPage;
 
             const [total, sucursales] = await Promise.all([

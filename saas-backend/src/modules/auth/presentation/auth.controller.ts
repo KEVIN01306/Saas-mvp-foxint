@@ -3,6 +3,7 @@ import type { LoginUseCase } from "../application/login.usecase.js";
 import type { Request, Response, NextFunction } from "express";
 import AppError from "@shared/errors/AppError.js";
 import type { RefreshTokenUseCase } from "../application/refresh-token.usecase.js";
+import type { ObtenerPerfilUseCase } from "../application/obtener-perfil.usecase.js";
 
 
 const COOKIE_OPTIONS = {
@@ -18,7 +19,8 @@ const NOMBRECOOKIEREFRESHTOKEN = "refreshToken"
 export class AuthController {
     constructor(
         private readonly loginUseCase: LoginUseCase,
-        private readonly refreshTokenUseCase: RefreshTokenUseCase
+        private readonly refreshTokenUseCase: RefreshTokenUseCase,
+        private readonly obtenerPerfilUseCase: ObtenerPerfilUseCase
     ) { }
 
     login = async (req: Request, res: Response, next: NextFunction) => {
@@ -58,4 +60,20 @@ export class AuthController {
         }
     }
 
+    obtenerPerfil = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const usuario = res.locals.usuario;
+            if (!usuario) {
+                throw new AppError("Usuario no autenticado", "UNAUTHORIZED", 401)
+            }
+
+            const perfil = await this.obtenerPerfilUseCase.execute(usuario.id)
+
+            return res.status(200).json(
+                Respuesta.exito("Perfil obtenido", perfil)
+            )
+        } catch (error) {
+            next(error)
+        }
+    }
 }

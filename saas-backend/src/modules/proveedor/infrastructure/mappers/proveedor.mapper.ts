@@ -11,10 +11,6 @@ export class ProveedorMapper {
             id: proveedor.id,
             nombre: proveedor.nombre,
             telefono: proveedor.telefono,
-            negocio: {
-                id: proveedor.negocios.id,
-                nombre_comercial: proveedor.negocios.nombre_comercial,
-            },
         };
     }
 
@@ -23,10 +19,6 @@ export class ProveedorMapper {
             id: proveedor.id,
             nombre: proveedor.nombre,
             telefono: proveedor.telefono,
-            negocio: {
-                id: proveedor.negocios.id,
-                nombre_comercial: proveedor.negocios.nombre_comercial,
-            },
         };
     }
 }

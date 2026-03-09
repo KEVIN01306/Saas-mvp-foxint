@@ -12,10 +12,6 @@ export class SucursalMapper {
             nombre: sucursal.nombre,
             es_principal: sucursal.es_principal,
             direccion: sucursal.direccion,
-            negocio: {
-                id: sucursal.negocios.id,
-                nombre_comercial: sucursal.negocios.nombre_comercial,
-            },
         };
     }
 
@@ -25,10 +21,6 @@ export class SucursalMapper {
             nombre: sucursal.nombre,
             es_principal: sucursal.es_principal,
             direccion: sucursal.direccion,
-            negocio: {
-                id: sucursal.negocios.id,
-                nombre_comercial: sucursal.negocios.nombre_comercial,
-            },
         };
     }
 }

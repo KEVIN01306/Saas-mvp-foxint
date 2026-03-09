@@ -13,13 +13,13 @@ const validarMiddleware = new ValidarMiddleware()
 router.use(authMiddleware.protegerRuta)
 
 router.get("/:id",
-    negocioController.buscarPorId
+    negocioController.obtener
 );
 
 router.post("/",
     FileUploadMiddleware.single('logo', 'negocios'),
     validarMiddleware.validarBody(negocioCrearSchema),
-    negocioController.crear
+    negocioController.registrar
 );
 
 router.use(authMiddleware.verificarRol(['ADMIN']))

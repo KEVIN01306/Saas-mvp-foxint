@@ -1,51 +1,52 @@
 import type { NextFunction, Request, Response } from "express";
-import type { BuscarPorIdUseCase } from "../application/buscar-por-id.usecase.js";
 import BaseController from "@shared/presentation/base.controller.js";
 import Respuesta from "@app/http/respuesta.js";
-import type { BuscarPorNegocioUseCase } from "../application/buscar-por-negocio.usecase.js";
-import type { CrearProveedorUseCase } from "../application/crear.usecase.js";
-import type { ActualizarProveedorUseCase } from "../application/actualizar.usecase.js";
-import type { EliminarProveedorUseCase } from "../application/eliminar.usecase.js";
+import type { ObtenerProveedorUseCase } from "../application/obetner-proveedorusecase.js";
+import type { ObtenerProveedoresUseCase } from "../application/obtener-proveedores.usecase.js";
+import type { RegistrarProveedorUseCase } from "../application/crear.proveedor.usecase.js";
+import type { ActualizarProveedorUseCase } from "../application/actualizar-proveedor.usecase.js";
+import type { EliminarProveedorUseCase } from "../application/eliminar-proveedor.usecase.js";
+
 
 export class ProveedorController extends BaseController {
 
     constructor(
-        private readonly buscarPorIdUseCase: BuscarPorIdUseCase,
-        private readonly buscarPorNegocioUseCase: BuscarPorNegocioUseCase,
-        private readonly crearProveedorUseCase: CrearProveedorUseCase,
+        private readonly obtenerProveedorUseCase: ObtenerProveedorUseCase,
+        private readonly obtenerProveedoresUseCase: ObtenerProveedoresUseCase,
+        private readonly registrarProveedorUseCase: RegistrarProveedorUseCase,
         private readonly actualizarProveedorUseCase: ActualizarProveedorUseCase,
         private readonly eliminarProveedorUseCase: EliminarProveedorUseCase
     ) {
         super()
     }
 
-    buscarPorId = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+    obtener = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params
             const { negocio_id } = this.obtenerEntorno(res)
-            const proveedor = await this.buscarPorIdUseCase.execute(id, negocio_id);
+            const proveedor = await this.obtenerProveedorUseCase.execute(id, negocio_id);
             res.status(200).json(Respuesta.exito('Proveedor obtenido con éxito', proveedor))
         } catch (error) {
             next(error)
         }
     }
 
-    buscarPorNegocio = async (_req: Request, res: Response, next: NextFunction) => {
+    listar = async (_req: Request, res: Response, next: NextFunction) => {
         try {
             const { negocio_id } = this.obtenerEntorno(res)
             const { limit, offset } = res.locals.query
             const page = Math.floor(offset / limit) + 1
-            const { total, data } = await this.buscarPorNegocioUseCase.execute({ negocio_id, page, perPage: limit });
+            const { total, data } = await this.obtenerProveedoresUseCase.execute({ negocio_id, page, perPage: limit });
             res.status(200).json(Respuesta.paginacion('Proveedores obtenidos con éxito', data, total, limit, offset))
         } catch (error) {
             next(error)
         }
     }
 
-    crear = async (req: Request, res: Response, next: NextFunction) => {
+    registrar = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { negocio_id } = this.obtenerEntorno(res)
-            const proveedor = await this.crearProveedorUseCase.execute(req.body, negocio_id)
+            const proveedor = await this.registrarProveedorUseCase.execute(req.body, negocio_id)
             res.status(201).json(Respuesta.exito('Proveedor creado con éxito', proveedor))
         } catch (error) {
             next(error)

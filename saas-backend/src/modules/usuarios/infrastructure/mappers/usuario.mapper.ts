@@ -30,10 +30,6 @@ export class UsuarioMapper {
             telefono: usuario.telefono,
             rol: this.mapRolVista(usuario.rol),
             verificado: usuario.verificado,
-            negocio: {
-                id: usuario.negocios.id,
-                nombre_comercial: usuario.negocios.nombre_comercial
-            }
         }
     }
 

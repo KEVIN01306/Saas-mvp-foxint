@@ -10,7 +10,7 @@ import type { Pagination } from "@shared/domain/pagination.js";
 export class PrismaUsuarioRepository implements UsuarioRepository {
     constructor(private readonly db: PrismaClient) { }
 
-    async buscarPorId(
+    async obtener(
         id: Usuario["id"],
         negocio_id: Usuario["negocio_id"]
     ): Promise<UsuarioObtenidoDetalle | null> {
@@ -26,7 +26,7 @@ export class PrismaUsuarioRepository implements UsuarioRepository {
     }
 
 
-    async buscarPorTelefono(
+    async obtenerPorTelefono(
         telefono: Usuario["telefono"],
     ): Promise<UsuarioObtenidoDetalle | null> {
 
@@ -42,7 +42,7 @@ export class PrismaUsuarioRepository implements UsuarioRepository {
     }
 
 
-    async buscarPorNegocio(
+    async listar(
         negocio_id: Usuario["negocio_id"],
         pagination: Pagination
     ): Promise<Paginated<UsuarioSimple>> {
@@ -74,7 +74,7 @@ export class PrismaUsuarioRepository implements UsuarioRepository {
 
     }
 
-    async crear(data: UsuarioCrear, negocio_id: Usuario["negocio_id"]): Promise<UsuarioSimple> {
+    async registrar(data: UsuarioCrear, negocio_id: Usuario["negocio_id"]): Promise<UsuarioSimple> {
         try {
             const usuario = await this.db.usuarios.create({
                 data: {

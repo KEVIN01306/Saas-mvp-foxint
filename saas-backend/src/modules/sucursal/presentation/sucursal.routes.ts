@@ -15,18 +15,18 @@ router.use(authMiddleware.protegerRuta)
 router.get('/',
     authMiddleware.verificarRol(['ADMIN', 'VENDEDOR']),
     validarMiddleware.validarQuery(paginacionQuerySchema),
-    sucursalController.buscarPorNegocio
+    sucursalController.listar
 );
 
 router.get('/:id',
     authMiddleware.verificarRol(['ADMIN', 'VENDEDOR']),
-    sucursalController.buscarPorId
+    sucursalController.obtener
 );
 
 router.post('/',
     authMiddleware.verificarRol(['ADMIN']),
     validarMiddleware.validarBody(sucursalCrearSchema),
-    sucursalController.crear
+    sucursalController.registrar
 );
 
 router.put('/:id',

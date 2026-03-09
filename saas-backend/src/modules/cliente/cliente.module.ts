@@ -1,25 +1,24 @@
-import { PrismaClient } from "@prisma/client";
 import { PrismaClienteRepository } from "./infrastructure/prisma-cliente.repository.js";
-import { BuscarPorIdUseCase } from "./application/buscar-por-id.usecase.js";
-import { BuscarPorNegocioUseCase } from "./application/buscar-por-negocio.usecase.js";
-import { CrearClienteUseCase } from "./application/crear.usecase.js";
-import { ActualizarClienteUseCase } from "./application/actualizar.usecase.js";
-import { EliminarClienteUseCase } from "./application/eliminar.usecase.js";
 import { ClienteController } from "./presentation/cliente.controller.js";
 import prisma from "@infrastructure/config/prisma.js";
+import { ObtenerClienteUseCase } from "./application/obtener-cliente.usecase.js";
+import { ObtenerClientesUseCase } from "./application/obtener-clientes.js";
+import { RegistrarClienteUseCase } from "./application/registrar-cliente.usecase.js";
+import { ActualizarClienteUseCase } from "./application/actualizar-cliente.usecase.js";
+import { EliminarClienteUseCase } from "./application/eliminar-cliente.usecase.js";
 
 const clienteRepository = new PrismaClienteRepository(prisma);
 
-const buscarPorIdUseCase = new BuscarPorIdUseCase(clienteRepository);
-const buscarPorNegocioUseCase = new BuscarPorNegocioUseCase(clienteRepository);
-const crearClienteUseCase = new CrearClienteUseCase(clienteRepository);
+const obtenerClienteUseCase = new ObtenerClienteUseCase(clienteRepository);
+const obtenerClientesUseCase = new ObtenerClientesUseCase(clienteRepository);
+const registrarClienteUseCase = new RegistrarClienteUseCase(clienteRepository);
 const actualizarClienteUseCase = new ActualizarClienteUseCase(clienteRepository);
 const eliminarClienteUseCase = new EliminarClienteUseCase(clienteRepository);
 
 export const clienteController = new ClienteController(
-    buscarPorIdUseCase,
-    buscarPorNegocioUseCase,
-    crearClienteUseCase,
+    obtenerClienteUseCase,
+    obtenerClientesUseCase,
+    registrarClienteUseCase,
     actualizarClienteUseCase,
     eliminarClienteUseCase
 );

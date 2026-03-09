@@ -16,17 +16,17 @@ router.use(authMiddleware.verificarRol(['ADMIN']))
 
 router.get('/',
     validarMiddleware.validarQuery(paginacionQuerySchema),
-    usuarioController.buscarPorNegocio
+    usuarioController.listar
 )
 
 
 router.get('/:id',
-    usuarioController.buscarPorId
+    usuarioController.obtener
 )
 
 router.post('/',
     validarMiddleware.validarBody(usuariosCrearSchema),
-    usuarioController.crear
+    usuarioController.registrar
 )
 
 router.put('/:id',

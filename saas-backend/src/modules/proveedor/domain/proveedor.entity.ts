@@ -5,19 +5,10 @@ export interface Proveedor {
     telefono: string | null;
 }
 
-export interface ProveedorObtenidoDetalle extends Omit<Proveedor, "negocio_id"> {
-    negocio: {
-        id: string;
-        nombre_comercial: string;
-    };
-}
+export interface ProveedorObtenidoDetalle extends Omit<Proveedor, "negocio_id"> {}
 
-export interface ProveedorSimple extends Pick<Proveedor, "id" | "nombre" | "telefono"> {
-    negocio: {
-        id: string;
-        nombre_comercial: string;
-    }
-}
+export interface ProveedorSimple extends Pick<Proveedor, "id" | "nombre" | "telefono"> {}
+
 
 export interface ProveedorCrear extends Omit<Proveedor, "id" | "negocio_id"> { }
 

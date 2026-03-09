@@ -3,6 +3,7 @@ import type { AuthRepository } from "../domain/auth.repository.js";
 import type { UsuarioAutentificacion } from "../domain/auth-user.entity.js";
 import type { Usuario } from "modules/usuarios/domain/usuario.entity.js";
 import type { Session } from "../domain/auth-session.entity.js";
+import { AuthMapper } from "./mappers/auth.mapper.js";
 
 
 export class PrismaAuthRespository implements AuthRepository {
@@ -14,20 +15,12 @@ export class PrismaAuthRespository implements AuthRepository {
     ): Promise<UsuarioAutentificacion | null> {
 
         const usuario = await this.db.usuarios.findUnique({
-            where: { telefono }
+            where: { telefono, activo: true }
         })
 
         if (!usuario) return null
 
-        return {
-            id: usuario.id,
-            nombre: usuario.nombre,
-            password_hash: usuario.password_hash,
-            telefono: usuario.telefono,
-            rol: usuario.rol,
-            activo: usuario.activo,
-            negocio_id: usuario.negocio_id,
-        }
+        return AuthMapper.mapUsuarioAutentificacion(usuario)
     }
 
     async buscarPorId(
@@ -35,20 +28,12 @@ export class PrismaAuthRespository implements AuthRepository {
     ): Promise<UsuarioAutentificacion | null> {
 
         const usuario = await this.db.usuarios.findUnique({
-            where: { id }
+            where: { id, activo: true }
         })
 
         if (!usuario) return null
 
-        return {
-            id: usuario.id,
-            nombre: usuario.nombre,
-            password_hash: usuario.password_hash,
-            telefono: usuario.telefono,
-            rol: usuario.rol,
-            activo: usuario.activo,
-            negocio_id: usuario.negocio_id,
-        }
+        return AuthMapper.mapUsuarioAutentificacion(usuario)
     }
 
     async actualizarCrearSesion(

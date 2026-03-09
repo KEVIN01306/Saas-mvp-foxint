@@ -8,7 +8,7 @@ import { ClienteMapper } from "./mappers/cliente.mapper.js";
 export class PrismaClienteRepository implements ClienteRepository {
     constructor(private readonly prisma: PrismaClient) { }
 
-    async crear(data: ClienteCrear, negocio_id: string): Promise<ClienteObtenidoDetalle> {
+    async registrar(data: ClienteCrear, negocio_id: string): Promise<ClienteObtenidoDetalle> {
         try {
             const cliente = await this.prisma.clientes.create({
                 data: {
@@ -48,7 +48,7 @@ export class PrismaClienteRepository implements ClienteRepository {
         }
     }
 
-    async buscarPorId(id: string, negocio_id: string): Promise<ClienteObtenidoDetalle | null> {
+    async obtener(id: string, negocio_id: string): Promise<ClienteObtenidoDetalle | null> {
         try {
             const cliente = await this.prisma.clientes.findUnique({
                 where: { id, negocio_id },
@@ -65,7 +65,7 @@ export class PrismaClienteRepository implements ClienteRepository {
         }
     }
 
-    async buscarPorNegocio(params: { negocio_id: string; page: number; perPage: number }): Promise<Paginated<ClienteSimple>> {
+    async listar(params: { negocio_id: string; page: number; perPage: number }): Promise<Paginated<ClienteSimple>> {
         try {
             const { negocio_id, page, perPage } = params;
             const skip = (page - 1) * perPage;

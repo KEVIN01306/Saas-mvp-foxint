@@ -7,7 +7,7 @@ import { NegocioMapper } from "./mappers/negocio.mapper.js";
 export class PrismaNegocioRepository implements NegocioRepository {
     constructor(private readonly prisma: PrismaClient) { }
 
-    async crear(data: NegocioCrear & { logo_url: string | null }): Promise<NegocioObtenidoDetalle> {
+    async registrar(data: NegocioCrear & { logo_url: string | null }): Promise<NegocioObtenidoDetalle> {
         try {
             const negocio = await this.prisma.negocios.create({
                 data: {
@@ -35,7 +35,7 @@ export class PrismaNegocioRepository implements NegocioRepository {
         }
     }
 
-    async buscarPorId(id: string): Promise<NegocioObtenidoDetalle | null> {
+    async obtener(id: string): Promise<NegocioObtenidoDetalle | null> {
         try {
             const negocio = await this.prisma.negocios.findUnique({
                 where: { id }
@@ -49,7 +49,21 @@ export class PrismaNegocioRepository implements NegocioRepository {
         }
     }
 
-    async buscarPorWaId(wa_id: string): Promise<NegocioObtenidoDetalle | null> {
+    async obtenerPorWaId(wa_id: string): Promise<NegocioObtenidoDetalle | null> {
+        try {
+            const negocio = await this.prisma.negocios.findUnique({
+                where: { wa_id }
+            });
+
+            if (!negocio) return null;
+
+            return NegocioMapper.mapDetalle(negocio);
+        } catch (error) {
+            throw PrismaErrorMapper.map(error);
+        }
+    }
+
+    async listar(wa_id: string): Promise<NegocioObtenidoDetalle | null> {
         try {
             const negocio = await this.prisma.negocios.findUnique({
                 where: { wa_id }
