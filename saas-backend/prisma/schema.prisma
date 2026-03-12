@@ -117,22 +117,26 @@ model inventario_stock {
 }
 
 model negocios {
-  id                     String        @id @default(uuid()) @db.Char(36)
-  nombre_comercial       String        @db.VarChar(100)
-  wa_id                  String        @unique(map: "wa_id") @db.VarChar(20)
-  nit_rut                String?       @db.VarChar(20)
-  logo_url               String?       @db.Text
-  slogan                 String?       @db.VarChar(255)
+  id                     String                 @id @default(uuid()) @db.Char(36)
+  nombre_comercial       String                 @db.VarChar(100)
+  wa_id                  String                 @unique(map: "wa_id") @db.VarChar(20)
+  nit_rut                String?                @db.VarChar(20)
+  logo_url               String?                @db.Text
+  slogan                 String?                @db.VarChar(255)
   datos_facturacion_json Json?
-  fecha_registro         DateTime?     @default(now()) @db.Timestamp(0)
+  fecha_registro         DateTime?              @default(now()) @db.Timestamp(0)
+  giro_negocio           negocios_giro_negocio  @default(OTRO)
+  modelo_venta           negocios_modelo_venta? @default(MENUDEO)
+  instagram_id           String?                @db.VarChar(100)
+  facebook_id            String?                @db.VarChar(100)
   categorias             categorias[]
   clientes               clientes[]
   compras                compras[]
   gastos                 gastos[]
   productos              productos[]
-  promociones            promociones[]
   proveedores            proveedores[]
   sucursales             sucursales[]
+  traslados              traslados[]
   usuarios               usuarios[]
   ventas                 ventas[]
 }
@@ -184,10 +188,11 @@ model promociones {
   fecha_inicio   DateTime         @db.DateTime(0)
   fecha_fin      DateTime         @db.DateTime(0)
   activa         Boolean?         @default(true)
+  sucursal_id    String           @db.Char(36)
   promocion_skus promocion_skus[]
-  negocios       negocios         @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "promociones_ibfk_1")
+  sucursales     sucursales       @relation(fields: [sucursal_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_promociones_sucursal")
 
-  @@index([negocio_id], map: "negocio_id")
+  @@index([sucursal_id], map: "fk_promociones_sucursal")
 }
 
 model proveedores {
@@ -212,34 +217,41 @@ model sku_variantes {
 }
 
 model skus {
-  id                    String              @id @default(uuid()) @db.Char(36)
-  producto_id           String              @db.Char(36)
-  codigo_barras         String?             @db.VarChar(50)
-  precio_venta          Decimal?            @default(0.00) @db.Decimal(12, 2)
-  precio_costo_promedio Decimal?            @default(0.00) @db.Decimal(12, 2)
-  detalle_compras       detalle_compras[]
-  detalle_ventas        detalle_ventas[]
-  inventario_stock      inventario_stock[]
-  producto_imagenes     producto_imagenes[]
-  promocion_skus        promocion_skus[]
-  sku_variantes         sku_variantes[]
-  productos             productos           @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "skus_ibfk_1")
+  id                      String              @id @default(uuid()) @db.Char(36)
+  producto_id             String              @db.Char(36)
+  codigo_barras           String?             @db.VarChar(50)
+  precio_venta            Decimal?            @default(0.00) @db.Decimal(12, 2)
+  precio_costo_promedio   Decimal?            @default(0.00) @db.Decimal(12, 2)
+  precio_mayoreo          Decimal?            @default(0.00) @db.Decimal(12, 2)
+  cantidad_minima_mayoreo Int?                @default(12)
+  unidad_medida           String?             @default("UNIDAD") @db.VarChar(20)
+  solo_mayoreo            Boolean?            @default(false)
+  detalle_compras         detalle_compras[]
+  detalle_ventas          detalle_ventas[]
+  inventario_stock        inventario_stock[]
+  producto_imagenes       producto_imagenes[]
+  promocion_skus          promocion_skus[]
+  sku_variantes           sku_variantes[]
+  productos               productos           @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "skus_ibfk_1")
 
   @@index([producto_id], map: "producto_id")
 }
 
 model sucursales {
-  id               String             @id @default(uuid()) @db.Char(36)
-  negocio_id       String             @db.Char(36)
-  nombre           String             @db.VarChar(100)
-  es_principal     Boolean?           @default(true)
-  direccion        String?            @db.Text
-  compras          compras[]
-  gastos           gastos[]
-  inventario_stock inventario_stock[]
-  negocios         negocios           @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sucursales_ibfk_1")
-  ventas           ventas[]
-  usuarios         usuarios[]
+  id                                                  String             @id @default(uuid()) @db.Char(36)
+  negocio_id                                          String             @db.Char(36)
+  nombre                                              String             @db.VarChar(100)
+  es_principal                                        Boolean?           @default(true)
+  direccion                                           String?            @db.Text
+  compras                                             compras[]
+  gastos                                              gastos[]
+  inventario_stock                                    inventario_stock[]
+  promociones                                         promociones[]
+  negocios                                            negocios           @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sucursales_ibfk_1")
+  traslados_traslados_sucursal_destino_idTosucursales traslados[]        @relation("traslados_sucursal_destino_idTosucursales")
+  traslados_traslados_sucursal_origen_idTosucursales  traslados[]        @relation("traslados_sucursal_origen_idTosucursales")
+  usuarios                                            usuarios[]
+  ventas                                              ventas[]
 
   @@index([negocio_id], map: "negocio_id")
 }
@@ -253,12 +265,12 @@ model usuarios {
   rol                  usuarios_rol
   verificado           Boolean?               @default(false)
   activo               Boolean?               @default(true)
-  codigos_verificacion codigos_verificacion[]
-  negocios             negocios               @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "usuarios_ibfk_1")
-  ventas               ventas[]
-  sessions             session?
-  sucursales           sucursales?            @relation(fields: [sucursalesId], references: [id])
   sucursalesId         String?                @db.Char(36)
+  codigos_verificacion codigos_verificacion[]
+  sessions             session?
+  negocios             negocios               @relation(fields: [negocio_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "usuarios_ibfk_1")
+  sucursales           sucursales?            @relation(fields: [sucursalesId], references: [id])
+  ventas               ventas[]
 
   @@index([negocio_id], map: "negocio_id")
   @@index([sucursalesId], map: "sucursalesId")
@@ -297,6 +309,33 @@ model ventas {
   @@index([usuario_id], map: "usuario_id")
 }
 
+model traslado_detalles {
+  id          String    @id @db.Char(36)
+  traslado_id String    @db.Char(36)
+  sku_id      String    @db.Char(36)
+  cantidad    Int
+  traslados   traslados @relation(fields: [traslado_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_det_tras")
+
+  @@index([traslado_id], map: "fk_det_tras")
+}
+
+model traslados {
+  id                                                   String              @id @db.Char(36)
+  negocio_id                                           String              @db.Char(36)
+  sucursal_origen_id                                   String              @db.Char(36)
+  sucursal_destino_id                                  String              @db.Char(36)
+  estado                                               traslados_estado?   @default(PENDIENTE)
+  fecha_envio                                          DateTime?           @default(now()) @db.Timestamp(0)
+  traslado_detalles                                    traslado_detalles[]
+  sucursales_traslados_sucursal_destino_idTosucursales sucursales          @relation("traslados_sucursal_destino_idTosucursales", fields: [sucursal_destino_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tras_des")
+  negocios                                             negocios            @relation(fields: [negocio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tras_neg")
+  sucursales_traslados_sucursal_origen_idTosucursales  sucursales          @relation("traslados_sucursal_origen_idTosucursales", fields: [sucursal_origen_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tras_ori")
+
+  @@index([sucursal_destino_id], map: "fk_tras_des")
+  @@index([negocio_id], map: "fk_tras_neg")
+  @@index([sucursal_origen_id], map: "fk_tras_ori")
+}
+
 enum promociones_tipo {
   PORCENTAJE
   MONTO_FIJO
@@ -319,4 +358,27 @@ enum gastos_categoria_gasto {
 enum usuarios_rol {
   ADMIN
   VENDEDOR
+}
+
+enum traslados_estado {
+  PENDIENTE
+  EN_TRANSITO
+  RECIBIDO
+  CANCELADO
+}
+
+enum negocios_giro_negocio {
+  ZAPATERIA
+  ROPA
+  ABARROTERIA
+  FARMACIA
+  COSMETICOS
+  ELECTRODOMESTICOS
+  OTRO
+}
+
+enum negocios_modelo_venta {
+  MENUDEO
+  MAYOREO
+  HIBRIDO
 }
